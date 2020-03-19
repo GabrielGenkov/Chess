@@ -1,0 +1,13 @@
+<title>Posts</title>
+
+{% if user != None %}
+<p>Hi {{ user.username }}!</p>
+
+<a href="/logout">Logout</a> <br/>
+
+{% elif user == None %}
+<a href="/register">Register</a>
+/
+<a href="/login">Login</a>
+{% endif %}
+
