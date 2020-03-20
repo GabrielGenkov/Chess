@@ -20,5 +20,8 @@
 			<br>
 			<button type="submit">Register</button>
 		</form>
+		{%if error != None%}
+		<p style="color:red">{{error}}</p>
+		{%endif%}
     </body>
 </html>

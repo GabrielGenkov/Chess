@@ -15,5 +15,8 @@
       <br>
 			<button type ="submit">Log In</button>
 		</form>
+		{%if error != None%}
+		<p style="color:red">{{error}}</p>
+		{%endif%}
     </body>
 </html>
