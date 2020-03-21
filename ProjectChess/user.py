@@ -35,3 +35,11 @@ class User:
 		if not values:
 			return None
 		return User(*values)
+	
+	@staticmethod
+	def load2(id):
+		with DB() as db:
+			values = db.execute("SELECT * from Users WHERE id = ?", (id,)).fetchone()
+		if not values:
+			return None
+		return User(*values)
