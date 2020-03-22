@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+/*var input = document.getElementById("m");
+
+input.addEventListener("keyup", function(event) {
+
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   document.getElementById("send-message").click();
+  }
+});*/
+
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+socket.on('connect', () => {
+	socket.emit('join',{'channel':'{{host.id}}', 'username':'{{user.username}}', 'mail':'{{user.mail}}'});
+});
+
+socket.on('disconnect', function(){
+	socket.emit('leave',{'channel':'{{host.id}}', 'username':'{{user.username}}', 'mail':'{{user.mail}}'});
+});
+
+function Send(){
+	var message = $('#m').val();
+	if(message == "") return false;
+	socket.emit('send message', {'message': "{{user.username}}: " + message, 'channel':'{{host.id}}'});
+	$('#m').val('');
+}
+
+socket.on('broadcast message', data =>{
+	$("#messages").append('<li style="color:grey">' + data + '</li>');
+});
+
+socket.on('broadcast user', data =>{
+	$("#users").append('<li style="color:grey">' + data + '</li>');
+});
+</script>
+</head>
+<body>
+<p>Host:{{host.username}}</p>
+<p>You are:{{user.username}}</p>
+<ul id="messages"></ul>
+<input type="text" id="m">
+<button id="send-message" onclick="Send()">Send</button>
+<ul id="users"></ul>
+</body>
+</html>
