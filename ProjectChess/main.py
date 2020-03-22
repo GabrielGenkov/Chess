@@ -1,7 +1,7 @@
+import os
+import hashlib
 from flask import Flask, redirect, url_for, request, render_template, session
 from flask_socketio import SocketIO, join_room, leave_room, emit, send
-
-import hashlib
 
 #from datetime import timedelta
 
@@ -17,7 +17,10 @@ app.config['SECRET_KEY'] = 'lrgnieijnWI;Evjwn;LH;EVbWKEVJNWIVHUIOihVNO'
 socketio = SocketIO(app)
 
 #app.permanent_session_lifetime = timedelta(minutes = 60)
-      
+
+users = dict()
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 	if request.method == 'GET':
@@ -73,7 +76,7 @@ def logout():
 	session.pop("user", None)
 	return redirect('/')
 
-@app.route('/<int:id>')
+'''@app.route('/<int:id>')
 def game(id):
 	curr_usr = None
 	if "user" in session:
@@ -81,12 +84,48 @@ def game(id):
 		host = User.load2(id)
 		if host:
 			return render_template('room.html', host = host, curr_usr = curr_usr)
-	return redirect('/')
+	return redirect('/')'''
 
-@socketio.on('message')
-def handleMessage(msg):
-	print('Message: ' + msg)
-	send(msg, broadcast=True)
+@app.route("/default/<int:id>")
+def chatroom(id):
+	global users
+	if not "user" in session:
+		return redirect('/')
+	if not User.load2(id):
+		return redirect('/')
+	if User.load1(session["user"]).mail == User.load2(id).mail and str(id) not in users:
+		users[str(id)] = list()
+	return render_template("room.html", user=User.load1(session["user"]), host = User.load2(id))
+	
+@socketio.on("send message")
+def message(data):
+    channel = data['channel']
+    message = data['message']
+    emit('broadcast message', message, channel)
+
+@socketio.on('join')
+def on_join(data):
+	global users
+	username = data['username']
+	channel = data['channel']
+	if str(channel) in users:
+		if data['mail'] not in users[str(channel)]:
+			users[str(channel)].append(data['mail'])
+			emit('broadcast users', users[str(channel)], channel)
+		print(users[str(channel)])
+	join_room(channel)
+	emit('broadcast message', username + ' has connected!', channel)
+
+@socketio.on('leave')
+def on_leave(data):
+	username = data['username']
+	channel = data['channel']
+	if str(channel) in users:
+		if data['mail'] in users[str(channel)]:
+			users[str(channel)].remove(data['mail'])
+	leave_room(channel)
+	emit('broadcast message', username + ' has left the room.', channel)
+
 
 if __name__ == '__main__':
 	#app.run(debug = True)
