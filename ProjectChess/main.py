@@ -93,6 +93,8 @@ def chatroom(id):
 		return redirect('/')
 	if not User.load2(id):
 		return redirect('/')
+	if User.load1(session["user"]).mail != User.load2(id).mail and str(id) not in users:
+		return redirect('/')
 	if User.load1(session["user"]).mail == User.load2(id).mail and str(id) not in users:
 		users[str(id)] = list()
 	return render_template("room.html", user=User.load1(session["user"]), host = User.load2(id))
