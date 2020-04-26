@@ -19,7 +19,8 @@ socketio = SocketIO(app)
 #app.permanent_session_lifetime = timedelta(minutes = 60)
 
 users = dict()
-
+positions = dict()
+histories = dict()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -29,6 +30,9 @@ def register():
 			error = session["r_err"]
 		return render_template('signin.html', error = error)
 	elif request.method == 'POST':
+		if len(request.form['password']) < 8:
+			session["r_err"] = "Too short password!!"
+			return redirect('/register')
 		values = (
 			None,
 			request.form['username'],
@@ -76,19 +80,12 @@ def logout():
 	session.pop("user", None)
 	return redirect('/')
 
-'''@app.route('/<int:id>')
-def game(id):
-	curr_usr = None
-	if "user" in session:
-		curr_usr = User.load1(session["user"])
-		host = User.load2(id)
-		if host:
-			return render_template('room.html', host = host, curr_usr = curr_usr)
-	return redirect('/')'''
-
 @app.route("/default/<int:id>")
 def chatroom(id):
 	global users
+	global positions
+	global histories
+	second_player = False
 	if not "user" in session:
 		return redirect('/')
 	if not User.load2(id):
@@ -97,7 +94,14 @@ def chatroom(id):
 		return redirect('/')
 	if User.load1(session["user"]).mail == User.load2(id).mail and str(id) not in users:
 		users[str(id)] = list()
-	return render_template("room.html", user=User.load1(session["user"]), host = User.load2(id))
+		positions[str(id)] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+		histories[str(id)] = ""
+	if User.load1(session["user"]).mail != User.load2(id).mail and str(id) in users:
+		if(len(users[str(id)]) == 1):
+			second_player = True
+		if(len(users[str(id)]) >= 2 and users[str(id)][1] == session["user"]):
+			second_player = True
+	return render_template("room.html", user=User.load1(session["user"]), host = User.load2(id), position = positions[str(id)], history = histories[str(id)] ,second_player = second_player)
 	
 @socketio.on("send message")
 def message(data):
@@ -128,6 +132,14 @@ def on_leave(data):
 	leave_room(channel)
 	emit('broadcast message', username + ' has left the room.', channel)
 
+@socketio.on("send position")
+def update_position(data):
+	position = data['position']
+	channel = data['channel']
+	history = data['history']
+	histories[str(channel)] = history
+	positions[str(channel)] = position
+	emit('broadcast table', history, channel)
 
 if __name__ == '__main__':
 	#app.run(debug = True)
