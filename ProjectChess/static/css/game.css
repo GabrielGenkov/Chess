@@ -1,4 +1,3 @@
-
 html{
   background: url("car.jpg"); 
   background-attachment: fixed;
@@ -9,9 +8,9 @@ html{
   text-align:center;
   background-size: 100%;
 }
+
 button{
-	
-	position: absolute;
+	position:static;
 	font-weight: bold;
 	bottom: 1vw;
 	right: -8vw;
@@ -42,17 +41,11 @@ ul{
 	position:static; 
 	font-size: 20px;	
 }
-#undo{
-	position:static;
-}
-#resign{
-	position:static;
-}
 #send-message{
-	position:relative; right: 480px; top: 420px;	
+	position:static; right: 480px; top: 420px;	
 }
 #m{
-	position:relative; right: 480px; top: 420px;	
+	position:static; right: 480px; top: 420px;	
 }
 #fen{
 
@@ -71,6 +64,16 @@ ul{
 	font-size: 20px;
 	position:static; left: 47%;	
 	color:yellow;
+}
+#pgn{
+	font-size: 20px;
+	position:static; left: 47%;	
+	color:yellow;
+}
+#myBoard{
+	margin: auto;
+	width: 50%;
+	padding: 10px;
 }
 #pgn{
 	font-size: 20px;
