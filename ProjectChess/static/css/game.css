@@ -1,16 +1,8 @@
-html{
-	background: url("header.jpg");
- 	list-style-type: none;
- 	margin: 0;
- 	padding: 0;
-	width: 100%;
-	overflow: hidden;
-	background-size: 100%;
-	font-size: 20px;
-}
+
 html{
   background: url("car.jpg"); 
-  height: 800px; 
+  background-attachment: fixed;
+  height: 100%; 
   width: 100%;
   background-repeat: no-repeat;
   font-size: 50px;
@@ -18,34 +10,43 @@ html{
   background-size: 100%;
 }
 button{
-		background-color: rgba(200,43,180,0.4);
-		color: #ffe4e1;
-		padding: 6px 10px;
-		margin: 8px 0;
-		border-style:ridge;
-		cursor: pointer;
-		width: 4%;
-		border-radius: 6%;
+	
+	position: absolute;
+	font-weight: bold;
+	bottom: 1vw;
+	right: -8vw;
+	-webkit-border-radius: .5vw;
+	line-height: 2.3vw;
+	color: orange;
+	background-color: #78899;
+	width: 13%
+	text-align: center;
+	border: yellow 2px solid;
 }
-label{
-	position:relative; left: -2%; bottom: 70px;
+.Fen{
+	position:static; left: 46%;
+	font-size: 20px;
+	color:white;
+}
+.Pgn{
+	position:static; left: 46%;
 	font-size: 20px;
 	color:white;
 }
 p{
-	position:relative; right: 50px; 
+	position:static; 
 	font-size: 20px;
 	color:white;	
 }
 ul{
-	position:relative; right: 50px; 
+	position:static; 
 	font-size: 20px;	
 }
 #undo{
-	position:relative; left: 280px; bottom: 330px;	
+	position:static;
 }
 #resign{
-	position:relative; left: 280px; bottom: 330px;	
+	position:static;
 }
 #send-message{
 	position:relative; right: 480px; top: 420px;	
@@ -56,26 +57,29 @@ ul{
 #fen{
 
 	font-size: 20px;
-	position:relative; left: -2%; bottom: 70px;
+	position:relative; left: -2%;
 	color:yellow;
 
 }
-#Status{
+.Status{
 	font-size: 20px;
-	position:relative; left: 130px; bottom: 400px;	
+	position:static; left: 47%;	
+	color:white;
+
 }
 #status{
 	font-size: 20px;
-	position:relative; left: 240px; bottom: 410px;	
-	color:white;
+	position:static; left: 47%;	
+	color:yellow;
 }
 #pgn{
 	font-size: 20px;
-	position:relative; left: -2%; bottom: 70px;	
+	position:static; left: 47%;	
 	color:yellow;
 }
 #myBoard{
-	size: 840px;
-	position:relative; left: 35%;
+	margin: auto;
+	width: 50%;
+	padding: 10px;
 }
 
