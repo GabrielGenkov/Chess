@@ -9,15 +9,6 @@
 <script src="{{url_for('static', filename='js/chess.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static', filename='css/chessboard.css') }}">
 
-
-<!--<img src="{{url_for('static', filename='css/img/chesspieces/wikipedia/wP.png')}}" id="a014-fcdf-b3b1-4678-ac76-3bbc-8a20-fb41" alt="" class="piece-417db" data-piece="wP" style="width: 49px; height: 49px;"> -->
-
-<!--<link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU" crossorigin="anonymous"> -->
-
-<!--<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD" crossorigin="anonymous"></script> -->
-
-<!--<img src="{{url_for('static', filename='css/img/chesspieces/wikipedia/wP.png')}}align="middle"/>  579  --> 
-
 <script type="text/javascript" charset="utf-8">
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
@@ -102,6 +93,16 @@ function onDragStart (source, piece, position, orientation) {
   	return false;
   }
   
+  {% if host.id == user.id %}
+  if(piece.search(/^b/) !== -1)return false;
+  
+  {% elif second_player %}
+  if(piece.search(/^w/) !== -1)return false;
+  
+  {% else %}
+  return false;
+  {% endif %}
+  
   // only pick up pieces for the side to move
   if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
       (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -119,8 +120,10 @@ function onDrop (source, target) {
 
   // illegal move
   if (move === null) return 'snapback'
-
+  
   updateStatus()
+  
+
 }
 
 function onMouseoverSquare (square, piece) {
@@ -129,6 +132,14 @@ function onMouseoverSquare (square, piece) {
     square: square,
     verbose: true
   })
+  
+  {% if host.id == user.id %}
+  if(piece.search(/^b/) !== -1)return ;
+  {% elif second_player %}
+  if(piece.search(/^w/) !== -1)return ;
+  {% else %}
+  return ;
+  {% endif %}
   
   // exit if there are no moves available for this square
   if (moves.length === 0) return
@@ -149,6 +160,7 @@ function onMouseoutSquare (square, piece) {
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
 function onSnapEnd () {
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
   board.position(game.fen())
 }
 
@@ -192,7 +204,7 @@ function pieceTheme (piece) {
 var config = {
   pieceTheme: pieceTheme,
   draggable: true,
-  position: 'start',//'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+  position: '{{position}}',
   onDragStart: onDragStart,
   onDrop: onDrop,
   onMouseoutSquare: onMouseoutSquare,
@@ -202,13 +214,44 @@ var config = {
 
 board = Chessboard('myBoard', config);
 
+updateStatus();
+
 $('#undo').on('click', function () {
   game.undo();
   board.position(game.fen());
   updateStatus();
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
 })
 
-updateStatus()
+$('#resign').on('click', function () {
+  var moveColor = 'White'
+  if (game.turn() === 'b') {
+    moveColor = 'Black'
+  }
+  $status.html(moveColor + "resigned")
+  game.clear();
+  board.clear;
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+})
+
+$('#start').on('click', function () {
+  board.start;
+  game.reset();
+  updateStatus();
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+})
+
+socket.on('broadcast table', data =>{
+	game.load_pgn(data);
+	board.position(game.fen());
+	updateStatus();
+});
+
+socket.on('connect', data => {
+	game.load_pgn('{{history}}');
+	board.position(game.fen());
+	updateStatus();
+});
 </script>
 
 </body>
