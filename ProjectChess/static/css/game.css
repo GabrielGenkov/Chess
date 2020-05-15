@@ -6,7 +6,8 @@ html{
   background-repeat: no-repeat;
   font-size: 50px;
   text-align:center;
-  background-size: 100%;
+  background-size: cover;
+  
 }
 
 button{
