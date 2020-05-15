@@ -4,7 +4,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
-<link rel="stylesheet" href="{{url_for('static', filename='css/game.css') }}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/game3.css') }}">
 <script src="{{url_for('static', filename='js/chessboard.js')}}"></script>
 <script src="{{url_for('static', filename='js/chess.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static', filename='css/chessboard.css') }}">
@@ -13,26 +13,22 @@
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
 socket.on('connect', () => {
-	socket.emit('join',{'channel':'{{host.id}}', 'username':'{{user.username}}', 'mail':'{{user.mail}}'});
+	socket.emit('join',{'channel':'{{mode}}' + '{{host.id}}','id':{{host.id}}});
 });
 
 socket.on('disconnect', function(){
-	socket.emit('leave',{'channel':'{{host.id}}', 'username':'{{user.username}}', 'mail':'{{user.mail}}'});
+	socket.emit('leave',{'channel':'{{mode}}' + '{{host.id}}', 'id':{{host.id}}});
 });
 
 function Send(){
 	var message = $('#m').val();
 	if(message == "") return false;
-	socket.emit('send message', {'message': "{{user.username}}: " + message, 'channel':'{{host.id}}'});
+	socket.emit('send message', {'message': message, 'user':'{{user.username}}', 'channel':'{{mode}}' + '{{host.id}}'});
 	$('#m').val('');
 }
 
 socket.on('broadcast message', data =>{
 	$("#messages").append('<li style="color:grey">' + data + '</li>');
-});
-
-socket.on('broadcast user', data =>{
-	$("#users").append('<li style="color:grey">' + data + '</li>');
 });
 </script>
 </head>
@@ -40,6 +36,7 @@ socket.on('broadcast user', data =>{
 
 <p>Host:{{host.username}}</p>
 <p>You are:{{user.username}}</p>
+<p>{{position}}</p>
 
 <ul id="messages"></ul>
 <input type="text" id="m">
@@ -50,6 +47,7 @@ socket.on('broadcast user', data =>{
 <button id="undo">Undo</button>
 <button id="resign">Resign</button>
 <button id="start">New Game</button>
+<button id="Draw">Draw</button>
 <div class="Status">
 	<label>Status:</label>
 	<div id="status"></div>
@@ -65,7 +63,7 @@ socket.on('broadcast user', data =>{
 
 <script> //chess setup
 var board = null
-var game = new Chess()
+var game = new Chess('{{position}}')
 var $status = $('#status')
 var $fen = $('#fen')
 var $pgn = $('#pgn')
@@ -160,7 +158,7 @@ function onMouseoutSquare (square, piece) {
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
 function onSnapEnd () {
-  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
   board.position(game.fen())
 }
 
@@ -220,7 +218,7 @@ $('#undo').on('click', function () {
   game.undo();
   board.position(game.fen());
   updateStatus();
-  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
 
 $('#resign').on('click', function () {
@@ -231,14 +229,14 @@ $('#resign').on('click', function () {
   $status.html(moveColor + "resigned")
   game.clear();
   board.clear;
-  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
 
 $('#start').on('click', function () {
   board.start;
   game.reset();
   updateStatus();
-  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{host.id}}'});
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
 
 socket.on('broadcast table', data =>{
