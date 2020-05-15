@@ -24,7 +24,8 @@ histories = dict()
 modes = dict()
 modes['default'] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 modes['horde'] = "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPKPPPP w kq - 0 1"
-
+modes['DickTrap'] = "rppppppr/pnbqkbnp/8/8/8/8/PNBQKBNP/RPPPPPPR w - - 0 1"
+modes['Sandwich'] = "pppppppp/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/PPPPPPPP w KQkq - 0 1"
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -46,7 +47,7 @@ def register():
 		)
 		user = User(*values).create()
 		if user:
-			user = User.load2(user.id)
+			user = User.load1(user.mail)
 			session["user"] = user.id
 			return redirect('/')
 		session["r_err"] = "This accaunt already exists!!"
