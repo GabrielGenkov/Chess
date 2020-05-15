@@ -36,7 +36,7 @@ socket.on('broadcast message', data =>{
 
 <p>Host:{{host.username}}</p>
 <p>You are:{{user.username}}</p>
-<p>{{position}}</p>
+
 
 <ul id="messages"></ul>
 <input type="text" id="m">
@@ -227,8 +227,8 @@ $('#resign').on('click', function () {
     moveColor = 'Black'
   }
   $status.html(moveColor + "resigned")
-  game.clear();
-  board.clear;
+  game.load('{{position}}');
+  board.position(game.fen());
   socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
 
@@ -245,11 +245,11 @@ socket.on('broadcast table', data =>{
 	updateStatus();
 });
 
-socket.on('connect', data => {
-	game.load_pgn('{{history}}');
-	board.position(game.fen());
-	updateStatus();
-});
+//socket.on('connect', data => {
+//	game.load_pgn('{{history}}');
+//	board.position(game.fen());
+//	updateStatus();
+//});
 </script>
 
 </body>
