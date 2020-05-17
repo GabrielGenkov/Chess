@@ -13,11 +13,11 @@
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
 socket.on('connect', () => {
-	socket.emit('join',{'channel':'{{mode}}' + '{{host.id}}','id':{{host.id}}});
+	socket.emit('join',{'channel':'{{mode}}' + '{{host.id}}','id':{{user.id}}});
 });
 
 socket.on('disconnect', function(){
-	socket.emit('leave',{'channel':'{{mode}}' + '{{host.id}}', 'id':{{host.id}}});
+	socket.emit('leave',{'channel':'{{mode}}' + '{{host.id}}', 'id':{{user.id}}});
 });
 
 function Send(){
@@ -47,7 +47,7 @@ socket.on('broadcast message', data =>{
 <button id="undo">Undo</button>
 <button id="resign">Resign</button>
 <button id="start">New Game</button>
-<button id="Draw">Draw</button>
+<button id="draw">Draw</button>
 <div class="Status">
 	<label>Status:</label>
 	<div id="status"></div>
@@ -227,14 +227,28 @@ $('#resign').on('click', function () {
     moveColor = 'Black'
   }
   $status.html(moveColor + "resigned")
+  game.reset();
+  game.load('{{position}}');
+  board.position(game.fen());
+  socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
+})
+
+$('#draw').on('click', function () {
+  var moveColor = 'White'
+  if (game.turn() === 'b') {
+    moveColor = 'Black'
+  }
+  $status.html(moveColor + "takes draw")
+  game.reset();
   game.load('{{position}}');
   board.position(game.fen());
   socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
 
 $('#start').on('click', function () {
-  board.start;
   game.reset();
+  game.load('{{position}}');
+  board.position(game.fen());
   updateStatus();
   socket.emit('send position', {'position': game.fen(), 'history': game.pgn(), 'channel':'{{mode}}' + '{{host.id}}'});
 })
@@ -245,11 +259,11 @@ socket.on('broadcast table', data =>{
 	updateStatus();
 });
 
-//socket.on('connect', data => {
-//	game.load_pgn('{{history}}');
-//	board.position(game.fen());
-//	updateStatus();
-//});
+/*socket.on('connect', data => {
+	game.load_pgn('{{history}}');
+	board.position(game.fen());
+	updateStatus();
+});*/
 </script>
 
 </body>
