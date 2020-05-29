@@ -11,7 +11,6 @@
 
 <script type="text/javascript" charset="utf-8">
 var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-
 socket.on('connect', () => {
 	socket.emit('join',{'channel':'{{mode}}' + '{{host.id}}','id':{{user.id}}});
 });
@@ -26,6 +25,50 @@ function Send(){
 	socket.emit('send message', {'message': message, 'user':'{{user.username}}', 'channel':'{{mode}}' + '{{host.id}}'});
 	$('#m').val('');
 }
+  
+
+function copyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+
+ 
+  textArea.style.position = 'fixed';
+  textArea.style.top = 0;
+  textArea.style.left = 0;
+
+
+  textArea.style.height = '2em';
+  textArea.style.padding = 0;
+
+  textArea.style.border = 'none';
+  textArea.style.outline = 'none';
+  textArea.style.boxShadow = 'none';
+
+  textArea.style.background = 'transparent';
+
+
+  textArea.value = text;
+
+  document.body.appendChild(textArea);
+
+  textArea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
+
+  document.body.removeChild(textArea);
+  alert("Send the already coppied link to your pal to play!");
+}
+
+function CopyLink() {
+  copyTextToClipboard(location.href);
+}
+
+    
 
 socket.on('broadcast message', data =>{
 	$("#messages").append('<li style="color:grey">' + data + '</li>');
@@ -48,6 +91,7 @@ socket.on('broadcast message', data =>{
 <button id="resign">Resign</button>
 <button id="start">New Game</button>
 <button id="draw">Draw</button>
+<button onclick="CopyLink()">Copy Link to play with a pal</button>
 <div class="Status">
 	<label>Status:</label>
 	<div id="status"></div>
@@ -69,6 +113,7 @@ var $fen = $('#fen')
 var $pgn = $('#pgn')
 var whiteSquareGrey = '#a9a9a9'
 var blackSquareGrey = '#696969'
+
 
 function removeGreySquares () {
   $('#myBoard .square-55d63').css('background', '')
@@ -213,6 +258,7 @@ var config = {
 board = Chessboard('myBoard', config);
 
 updateStatus();
+
 
 $('#undo').on('click', function () {
   game.undo();
