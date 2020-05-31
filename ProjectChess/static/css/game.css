@@ -17,11 +17,11 @@ button{
 	right: -8vw;
 	-webkit-border-radius: .5vw;
 	line-height: 2.3vw;
-	color: orange;
+	color: blue;
 	background-color: #78899;
 	width: 13%
 	text-align: center;
-	border: yellow 2px solid;
+	border: black 2px solid;
 }
 .Fen{
 	position:static; left: 46%;
@@ -48,28 +48,39 @@ ul{
 #m{
 	position:static; right: 480px; top: 420px;	
 }
-#fen{
 
+#fen{
+	
 	font-size: 20px;
 	position:relative; left: -2%;
 	color:yellow;
+	
+}
 
+.Texts{
+	
+	background-color:rgba(0,0,0,0.7);
+	border: 2px solid black;
+	
 }
 .Status{
 	font-size: 20px;
 	position:static; left: 47%;	
 	color:white;
+	
 
 }
 #status{
 	font-size: 20px;
 	position:static; left: 47%;	
 	color:yellow;
+	
 }
 #pgn{
 	font-size: 20px;
 	position:static; left: 47%;	
 	color:yellow;
+	
 }
 #myBoard{
 	margin: auto;
@@ -80,10 +91,22 @@ ul{
 	font-size: 20px;
 	position:static; left: 47%;	
 	color:yellow;
+	
 }
 #myBoard{
 	margin: auto;
 	width: 50%;
 	padding: 10px;
 }
+
+
+
+
+
+
+
+
+
+
+
 
