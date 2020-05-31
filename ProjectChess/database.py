@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS Users
         id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 		username	TEXT NOT NULL,
 		mail	TEXT NOT NULL UNIQUE,
-		password	TEXT NOT NULL
+		password	TEXT NOT NULL,
+		points INTEGER
     )
 ''')
 conn.commit()

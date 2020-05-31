@@ -22,6 +22,7 @@ users = dict()
 positions = dict()
 histories = dict()
 modes = dict()
+
 modes['default'] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 modes['horde'] = "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPKPPPP w kq - 0 1"
 modes['DickTrap'] = "rppppppr/pnbqkbnp/8/8/8/8/PNBQKBNP/RPPPPPPR w - - 0 1"
@@ -79,7 +80,7 @@ def main():
 	user = None
 	if "user" in session:
 		user = User.load2(session["user"])
-	return render_template('index.html',user = user)
+	return render_template('index.html',user = user, users = User.all())
 
 @app.route('/logout')
 def logout():
@@ -103,12 +104,14 @@ def chatroom(mode,id):
 		users[mode + str(id)] = list()
 		positions[mode + str(id)] = modes[mode]
 		histories[mode + str(id)] = ""
+		if mode is not "default":
+			histories[mode + str(id)] = '''[SetUp "1"] [FEN "''' + modes[mode] +'''"]'''
 	if session["user"] != id and mode + str(id) in users:
 		if(len(users[mode + str(id)]) == 1):
 			second_player = True
 		if(len(users[mode + str(id)]) >= 2 and users[mode + str(id)][1] == session["user"]):
 			second_player = True
-	return render_template("room.html", user=User.load2(session["user"]), host = User.load2(id), position = positions[mode + str(id)], history = histories[mode + str(id)] ,second_player = second_player, mode = mode)
+	return render_template("room.html", user=User.load2(session["user"]), host = User.load2(id), starting_position = modes[mode], position = positions[mode + str(id)], history = histories[mode + str(id)] ,second_player = second_player, mode = mode)
 	
 @socketio.on("send message")
 def message(data):
@@ -147,6 +150,11 @@ def update_position(data):
 	histories[str(channel)] = history
 	positions[str(channel)] = position
 	emit('broadcast table', history, channel)
+
+@socketio.on("give points")
+def give_points(data):
+	user = User.load2(users[str(data['channel'])][data['winner'] - 1])
+	user.addPoints(data['points'])
 
 if __name__ == '__main__':
 	#app.run(debug = True)

@@ -22,6 +22,12 @@
   <button class="button" onclick="location.href='/DickTrap/{{user.id}}'">Dick TRAP!!!</button>
   <button class="button" onclick="location.href='/Sandwich/{{user.id}}'">Sandwich!!!</button>
   {% endif %}
+  <h3>LeaderBoard</h3>
+  <ol>
+  {% for curr_user in users %}
+  <li>{{curr_user.id}} {{curr_user.username}} : {{curr_user.points}}</li>
+  {% endfor %}
+  </ol>
 </div>
 
 </body>

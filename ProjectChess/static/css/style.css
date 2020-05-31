@@ -67,3 +67,15 @@ li a:hover:not(.active) {
 .active {
   background-color: #4CAF50;
 }
+
+ol{
+	margin-left:15px;
+}
+
+ol li{
+	color:white;
+}
+
+h3{
+	color:white;
+}

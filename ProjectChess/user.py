@@ -1,24 +1,44 @@
 from database import DB
 
 class User:
-	def __init__(self, id, username, mail, password):
+	def __init__(self, id, username, mail, password, points = 0):
 		self.id = id
 		self.username = username
 		self.mail = mail
 		self.password = password
+		self.points = points
 
 	def create(self):
 		with DB() as db:  
-			values = (self.username, self.mail, self.password)
+			values = (self.username, self.mail, self.password, 0)
 			check = db.execute('''
 				SELECT mail FROM Users WHERE mail=?''', 
 				(self.mail,)).fetchone()
 			if check:
 				return None
 			db.execute('''
-				INSERT INTO Users (username, mail, password)
-				VALUES (?, ?, ?)''', values)
+				INSERT INTO Users (username, mail, password, points)
+				VALUES (?, ?, ?, ?)''', values)
 			return self
+			
+	def addPoints(self, points):
+		with DB() as db:
+			check = db.execute('''
+				SELECT mail FROM Users WHERE mail=?''', 
+				(self.mail,)).fetchone()
+			if not check:
+				return None
+			if points == 0:
+				return None
+			values = (self.points + points, self.id)
+			db.execute('UPDATE Users SET points = ? WHERE id = ?', values)
+			return self
+
+	@staticmethod
+	def all():
+		with DB() as db:
+			rows = db.execute('SELECT * FROM Users WHERE points > 0 ORDER BY points DESC').fetchall()
+			return [User(*row) for row in rows]
 
 	@staticmethod
 	def load(mail, password):
@@ -43,3 +63,5 @@ class User:
 		if not values:
 			return None
 		return User(*values)
+		
+	
